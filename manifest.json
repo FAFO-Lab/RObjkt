@@ -1,6 +1,6 @@
 {
     "name": "RObjkt",
-    "version": "0.3",
+    "version": "1.0",
     "manifest_version": 3,
     "description": "RAID Objkt: Ensures your referral wallet is always set on objkt.com.",
     "permissions": ["storage", "webRequest", "webRequestBlocking", "declarativeNetRequest", "activeTab"],
