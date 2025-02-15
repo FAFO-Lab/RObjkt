@@ -31,7 +31,7 @@ RObjkt (**RAID Objkt**) is a browser extension designed for the **TIAR (This Is 
 
 ### 🔹 **Manual Installation (For Developers)**
 
-1. **Download the latest release** from [GitHub](https://github.com/your-repo-name).
+1. **Download the latest release** from [GitHub](https://github.com/skullzarmy/RObjkt).
 2. Unzip the folder.
 3. Open **Google Chrome** and go to `chrome://extensions/`.
 4. Enable **Developer Mode** (toggle in the top right).
@@ -53,7 +53,9 @@ RObjkt (**RAID Objkt**) is a browser extension designed for the **TIAR (This Is 
 
 ## 📸 Screenshots
 
-_(Add screenshots of the popup & options page here)_
+### Settings Preview
+
+![Settings](./settings.webp)
 
 ---
 
@@ -96,7 +98,7 @@ This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for m
 
 -   Built for the **TIAR (This IS A Raid) community** at [thisisaraid.xyz](https://thisisaraid.xyz).
 -   Inspired by the need to **maximize referral rewards** during NFT raids on objkt.com.
--   Created by **[Your Name]**.
+-   Created by [**skllzrmy.tez**](https://github.com/skullzarmy).
 
 ---
 
