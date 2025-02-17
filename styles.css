@@ -146,3 +146,13 @@ input:checked + .slider:before {
 .sub {
     font-size: 0.8em;
 }
+
+.footer {
+    margin-top: 20px;
+    color: #777;
+}
+
+.footer a {
+    color: #777;
+    text-decoration: none;
+}
