@@ -1,49 +1,38 @@
 function updateReferralRule(refWallet, isEnabled, isPassive) {
-    chrome.declarativeNetRequest.updateDynamicRules(
-        {
-            removeRuleIds: [1], // ✅ Remove previous rule first, ensures a clean slate
-        },
-        () => {
-            if (isEnabled) {
-                let rule = {
-                    id: 1,
-                    priority: 1,
-                    action: {
-                        type: "redirect",
-                        redirect: {
-                            transform: {
-                                queryTransform: {
-                                    // ✅ Passive mode logic: Only set ref if it's not already present
-                                    addOrReplaceParams: isPassive
-                                        ? [{ key: "ref", replaceOnlyEmpty: true, value: refWallet }]
-                                        : [{ key: "ref", value: refWallet }],
-                                },
+    chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [1] }, () => {
+        if (isEnabled) {
+            let rule = {
+                id: 1,
+                priority: 1,
+                action: {
+                    type: "redirect",
+                    redirect: {
+                        transform: {
+                            queryTransform: {
+                                addOrReplaceParams: isPassive
+                                    ? [{ key: "ref", replaceOnlyEmpty: true, value: refWallet }]
+                                    : [{ key: "ref", value: refWallet }],
                             },
                         },
                     },
-                };
-
-                chrome.declarativeNetRequest.updateDynamicRules({ addRules: [rule] });
-            }
+                },
+            };
+            chrome.declarativeNetRequest.updateDynamicRules({ addRules: [rule] });
         }
-    );
+    });
 }
 
 function updateIcon(isEnabled) {
-    const icon = isEnabled ? "icon-on.png" : "icon-off.png";
-    chrome.action.setIcon({ path: icon });
+    chrome.action.setIcon({ path: isEnabled ? "icon-on.png" : "icon-off.png" });
 }
 
-// ✅ Set the correct icon and referral rule on startup
-chrome.storage.local.get(
-    { isEnabled: true, isPassive: false, refWallet: "tz1g4u4S2Fg7jsJVMmbYujxXQYsJB7ecSWGJ" },
-    (data) => {
-        updateReferralRule(data.refWallet, data.isEnabled, data.isPassive);
-        updateIcon(data.isEnabled);
-    }
-);
+// Set default values on startup
+chrome.storage.local.get({ isEnabled: true, isPassive: false, refWallet: CONFIG.DEFAULT_WALLET }, (data) => {
+    updateReferralRule(data.refWallet, data.isEnabled, data.isPassive);
+    updateIcon(data.isEnabled);
+});
 
-// ✅ Toggle from toolbar icon click
+// Handle toolbar toggle
 chrome.action.onClicked.addListener(() => {
     chrome.storage.local.get(["isEnabled", "refWallet", "isPassive"], (data) => {
         const newState = !data.isEnabled;
@@ -54,7 +43,7 @@ chrome.action.onClicked.addListener(() => {
     });
 });
 
-// ✅ Listen for state changes from popup
+// Listen for state changes
 chrome.runtime.onMessage.addListener((message) => {
     if (message.type === "updateState") {
         chrome.storage.local.set({ isEnabled: message.isEnabled }, () => {
@@ -69,7 +58,6 @@ chrome.runtime.onMessage.addListener((message) => {
     }
 });
 
-// ✅ Ensure icon updates & Passive Mode toggles on storage changes
 chrome.storage.onChanged.addListener((changes) => {
     if (changes.isEnabled || changes.refWallet || changes.isPassive) {
         chrome.storage.local.get(["isEnabled", "refWallet", "isPassive"], (data) => {

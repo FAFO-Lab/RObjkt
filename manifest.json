@@ -11,7 +11,7 @@
     "content_scripts": [
         {
             "matches": ["https://objkt.com/*"],
-            "js": ["content.js"],
+            "js": ["config.js", "content.js"],
             "run_at": "document_start"
         }
     ],
