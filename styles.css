@@ -16,6 +16,9 @@ h3 {
 .form-group {
     margin-bottom: 15px;
     text-align: left;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
 }
 
 .form-group label {
@@ -128,6 +131,9 @@ input:checked + .slider:before {
     }
     h3 {
         color: #f9f9f9;
+    }
+    .form-group {
+        border: 1px solid #555;
     }
     .form-group label {
         color: #ccc;

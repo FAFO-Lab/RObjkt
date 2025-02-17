@@ -1,5 +1,4 @@
-import { DEFAULT_WALLET } from "./config";
-chrome.storage.local.get({ isEnabled: false, isPassive: true, refWallet: DEFAULT_WALLET }, (data) => {
+chrome.storage.local.get({ isEnabled: false, isPassive: true, refWallet: CONFIG.DEFAULT_WALLET }, (data) => {
     console.log("Extension Loaded with Settings:", data);
     if (!data.isEnabled) return;
 
