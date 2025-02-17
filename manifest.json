@@ -1,8 +1,8 @@
 {
     "name": "RObjkt",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "manifest_version": 3,
-    "description": "RAID Objkt: Ensures your referral wallet is always set on objkt.com.",
+    "description": "Referral Objkt: Ensures your referral wallet is always set on objkt.com.",
     "permissions": ["storage", "webRequest", "webRequestBlocking", "declarativeNetRequest", "activeTab"],
     "host_permissions": ["https://objkt.com/*"],
     "background": {
@@ -22,6 +22,5 @@
             "48": "icon-off.png",
             "128": "icon-off.png"
         }
-    },
-    "options_page": "options.html"
+    }
 }

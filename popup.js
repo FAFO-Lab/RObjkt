@@ -46,7 +46,7 @@ document.getElementById("clear").addEventListener("click", () => {
     document.getElementById("wallet").value = "";
 });
 
-document.getElementById("toggle").addEventListener("change", (event) => {
+document.getElementById("activeToggle").addEventListener("change", (event) => {
     let isEnabled = event.target.checked;
 
     chrome.storage.local.set({ isEnabled }, () => {
@@ -59,11 +59,21 @@ document.getElementById("toggle").addEventListener("change", (event) => {
     });
 });
 
-chrome.storage.local.get(["refWallet", "isEnabled"], (data) => {
+document.getElementById("passiveToggle").addEventListener("change", (event) => {
+    let isPassive = !event.target.checked;
+
+    chrome.storage.local.set({ isPassive }, () => {
+        // Also notify the background script
+        chrome.runtime.sendMessage({ type: "updateState", isPassive });
+    });
+});
+
+chrome.storage.local.get(["refWallet", "isEnabled", "isPassive"], (data) => {
     if (data.refWallet) {
         document.getElementById("wallet").value = data.refWallet;
     }
-    document.getElementById("toggle").checked = data.isEnabled !== false; // Default true
+    document.getElementById("activeToggle").checked = data.isEnabled !== false; // Default true
+    document.getElementById("passiveToggle").checked = !data.isPassive; // Correct initialization
 });
 
 const isValidTezosAddress = (address) => {
