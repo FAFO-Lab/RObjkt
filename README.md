@@ -32,7 +32,7 @@ RObjkt (**Referral Objkt**) is a browser extension designed for the **Tezos** co
 
 ### 🔹 **Manual Installation (For Developers)**
 
-1. **Download the latest release** from [GitHub](https://github.com/skullzarmy/RObjkt/releases/tag/v1.0.1).
+1. **Download the latest release** from [GitHub](https://github.com/skullzarmy/RObjkt/releases/tag/v1.0.2).
 2. Unzip the folder.
 3. Open **Google Chrome** and go to `chrome://extensions/`.
 4. Enable **Developer Mode** (toggle in the top right).
