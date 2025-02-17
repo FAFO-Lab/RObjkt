@@ -2,7 +2,7 @@
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-RObjkt (**RAID Objkt**) is a browser extension designed for the **Tezos** community to **automatically set the wallet of their choice as the referrer** during NFT purchases on [objkt.com](https://objkt.com).
+RObjkt (**Referral Objkt**) is a browser extension designed for the **Tezos** community to **automatically set the wallet of their choice as the referrer** during NFT purchases on [objkt.com](https://objkt.com).
 
 > **No Chrome Web Store listing yet, but it's coming soon!**  
 > **Firefox support also coming soon.** 🔥
@@ -11,7 +11,7 @@ RObjkt (**RAID Objkt**) is a browser extension designed for the **Tezos** commun
 
 ## ✨ Features
 
--   ✅ **Automatically applies the TIAR raid wallet** as the referrer during objkt.com raids.
+-   ✅ **Automatically applies preferred wallet** as the referrer during objkt.com purchases.
 -   ✅ **Ensures max referral rewards** are directed to the right place.
 -   ✅ **Quick toggle ON/OFF** from the extension popup or toolbar.
 -   ✅ **Passive Mode** allows you to ensure there's a referral but not overwrite other referrals.
