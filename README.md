@@ -1,4 +1,4 @@
-# RObjkt - RAID Objkt (A Referral Enhancer for Objkt.com)
+# RObjkt - Referral Objkt (A Referral Enhancer for Objkt.com)
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
