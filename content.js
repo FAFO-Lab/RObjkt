@@ -2,7 +2,7 @@ chrome.storage.local.get({ isEnabled: false, isPassive: true, refWallet: CONFIG.
     console.log("Extension Loaded with Settings:", data);
     if (!data.isEnabled) return;
 
-    function updateURL() {
+    function updateURL(forceReload = false) {
         let url = new URL(window.location.href);
         let currentRef = url.searchParams.get("ref");
 
@@ -12,6 +12,8 @@ chrome.storage.local.get({ isEnabled: false, isPassive: true, refWallet: CONFIG.
                 console.log("No existing ref detected. Setting ref to:", data.refWallet);
                 url.searchParams.set("ref", data.refWallet);
                 window.history.replaceState({}, "", url.toString());
+
+                if (forceReload) location.reload();
             }
         } else {
             // ✅ Passive Mode OFF: Always set ref, overwriting any existing one
@@ -19,11 +21,14 @@ chrome.storage.local.get({ isEnabled: false, isPassive: true, refWallet: CONFIG.
                 console.log("Overwriting ref with:", data.refWallet);
                 url.searchParams.set("ref", data.refWallet);
                 window.history.replaceState({}, "", url.toString());
+
+                if (forceReload) location.reload();
             }
         }
     }
 
-    updateURL();
+    updateURL(true); // ✅ Apply change and reload if necessary
+
     const observer = new MutationObserver(() => {
         let url = new URL(window.location.href);
         let currentRef = url.searchParams.get("ref");
@@ -33,12 +38,16 @@ chrome.storage.local.get({ isEnabled: false, isPassive: true, refWallet: CONFIG.
                 console.log("SPA Navigation Detected: No existing ref, setting ref to:", data.refWallet);
                 url.searchParams.set("ref", data.refWallet);
                 window.history.replaceState({}, "", url.toString());
+
+                location.reload();
             }
         } else {
             if (!currentRef || currentRef !== data.refWallet) {
                 console.log("SPA Navigation Detected: Overwriting ref with:", data.refWallet);
                 url.searchParams.set("ref", data.refWallet);
                 window.history.replaceState({}, "", url.toString());
+
+                location.reload();
             }
         }
     });
