@@ -104,8 +104,7 @@ This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for m
 
 ## ❤️ Credits
 
--   This is a FAFO Lab Joint
--   Created by [**skllzrmy.tez**](https://github.com/skullzarmy).
+-   Created by [**skllzrmy.tez**](https://github.com/skullzarmy) & FAFO Lab
 
 ---
 
