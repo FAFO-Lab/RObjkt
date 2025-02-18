@@ -71,7 +71,7 @@ document.getElementById("activeToggle").addEventListener("change", (event) => {
  * @param {Event} event - The change event triggered by the checkbox.
  */
 document.getElementById("passiveToggle").addEventListener("change", (event) => {
-    let isPassive = !event.target.checked;
+    let isPassive = event.target.checked;
     chrome.storage.local.set({ isPassive }, () => {
         chrome.runtime.sendMessage({ type: "updatePassive", isPassive });
     });

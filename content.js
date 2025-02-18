@@ -3,7 +3,7 @@
  */
 chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
     const isEnabled = data.isEnabled ?? false;
-    const isPassive = data.isPassive ?? true;
+    const isPassive = data.isPassive ?? false;
     const refWallet = data.refWallet ?? "tz1ZzSmVcnVaWNZKJradtrDnjSjzTp6qjTEW"; // Default wallet
 
     console.log("Extension Loaded with Settings:", { isEnabled, isPassive, refWallet });
