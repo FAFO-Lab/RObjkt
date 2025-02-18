@@ -1,4 +1,9 @@
 /**
+ * Global configuration settings for the extension.
+ */
+const DEFAULT_WALLET = "tz1ZzSmVcnVaWNZKJradtrDnjSjzTp6qjTEW";
+
+/**
  * Updates the referral rule by modifying Chrome's declarativeNetRequest dynamic rules.
  * It sets or removes the referral parameter in objkt.com URLs based on the user's settings.
  *
@@ -40,12 +45,36 @@ function updateIcon(isEnabled) {
 }
 
 /**
+ * Ensures default settings are stored when the extension is installed.
+ */
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
+        let defaults = {
+            isEnabled: data.isEnabled ?? false,
+            isPassive: data.isPassive ?? true,
+            refWallet: data.refWallet ?? DEFAULT_WALLET,
+        };
+
+        chrome.storage.local.set(defaults, () => {
+            updateReferralRule(defaults.refWallet, defaults.isEnabled, defaults.isPassive);
+            updateIcon(defaults.isEnabled);
+        });
+    });
+});
+
+/**
  * Initializes the extension settings on startup.
  * Retrieves stored settings and applies the referral rule and icon state.
  */
-chrome.storage.local.get({ isEnabled: true, isPassive: false, refWallet: CONFIG.DEFAULT_WALLET }, (data) => {
-    updateReferralRule(data.refWallet, data.isEnabled, data.isPassive);
-    updateIcon(data.isEnabled);
+chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
+    let settings = {
+        isEnabled: data.isEnabled ?? false,
+        isPassive: data.isPassive ?? true,
+        refWallet: data.refWallet ?? DEFAULT_WALLET,
+    };
+
+    updateReferralRule(settings.refWallet, settings.isEnabled, settings.isPassive);
+    updateIcon(settings.isEnabled);
 });
 
 /**

@@ -1,9 +1,14 @@
 /**
  * Retrieves stored settings and applies referral modifications based on user preferences.
  */
-chrome.storage.local.get({ isEnabled: false, isPassive: true, refWallet: CONFIG.DEFAULT_WALLET }, (data) => {
-    console.log("Extension Loaded with Settings:", data);
-    if (!data.isEnabled) return;
+chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
+    const isEnabled = data.isEnabled ?? false;
+    const isPassive = data.isPassive ?? true;
+    const refWallet = data.refWallet ?? "tz1ZzSmVcnVaWNZKJradtrDnjSjzTp6qjTEW"; // Default wallet
+
+    console.log("Extension Loaded with Settings:", { isEnabled, isPassive, refWallet });
+
+    if (!isEnabled) return;
 
     /**
      * Modifies the current URL to include the referral parameter.
@@ -16,17 +21,17 @@ chrome.storage.local.get({ isEnabled: false, isPassive: true, refWallet: CONFIG.
         let currentRef = url.searchParams.get("ref");
         let shouldReload = false;
 
-        if (data.isPassive) {
+        if (isPassive) {
             if (!currentRef) {
-                console.log("No existing ref detected. Setting ref to:", data.refWallet);
-                url.searchParams.set("ref", data.refWallet);
+                console.log("No existing ref detected. Setting ref to:", refWallet);
+                url.searchParams.set("ref", refWallet);
                 window.history.replaceState({}, "", url.toString());
                 shouldReload = true;
             }
         } else {
-            if (!currentRef || currentRef !== data.refWallet) {
-                console.log("Overwriting ref with:", data.refWallet);
-                url.searchParams.set("ref", data.refWallet);
+            if (!currentRef || currentRef !== refWallet) {
+                console.log("Overwriting ref with:", refWallet);
+                url.searchParams.set("ref", refWallet);
                 window.history.replaceState({}, "", url.toString());
                 shouldReload = true;
             }
@@ -48,17 +53,17 @@ chrome.storage.local.get({ isEnabled: false, isPassive: true, refWallet: CONFIG.
         let currentRef = url.searchParams.get("ref");
         let shouldReload = false;
 
-        if (data.isPassive) {
+        if (isPassive) {
             if (!currentRef) {
-                console.log("SPA Navigation Detected: No existing ref, setting ref to:", data.refWallet);
-                url.searchParams.set("ref", data.refWallet);
+                console.log("SPA Navigation Detected: No existing ref, setting ref to:", refWallet);
+                url.searchParams.set("ref", refWallet);
                 window.history.replaceState({}, "", url.toString());
                 shouldReload = true;
             }
         } else {
-            if (!currentRef || currentRef !== data.refWallet) {
-                console.log("SPA Navigation Detected: Overwriting ref with:", data.refWallet);
-                url.searchParams.set("ref", data.refWallet);
+            if (!currentRef || currentRef !== refWallet) {
+                console.log("SPA Navigation Detected: Overwriting ref with:", refWallet);
+                url.searchParams.set("ref", refWallet);
                 window.history.replaceState({}, "", url.toString());
                 shouldReload = true;
             }

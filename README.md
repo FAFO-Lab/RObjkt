@@ -47,8 +47,6 @@ RObjkt (**Referral Objkt**) is a browser extension designed for the **Tezos** co
 
 ## 🔧 How to Use
 
-In standard Markdown, you can’t directly set image width. One workaround is to use HTML tags:
-
 1. **Click the RObjkt extension icon** <img src="icon-off.png" alt="RObjkt extension icon off" width="24" /> in your browser toolbar.
 1. **Enable/Disable** the extension using the toggle switch. You can verify the icon changed to <img src="icon-on.png" alt="RObjkt extension icon on" width="24">
 1. **Default mode:** Until you set a wallet of your preference, the FAFO wallet is used as default.
