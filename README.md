@@ -54,7 +54,7 @@ In standard Markdown, you can’t directly set image width. One workaround is to
 1. **Default mode:** Until you set a wallet of your preference, the FAFO wallet is used as default.
 1. **Override mode:** Enter a custom Tezos wallet to use as the referral address.
 1. **Passive mode:** Allow previously set referrals to stay. Will not overwrite if a referral wallet is present.
-1. Click **"Save"** – That’s it! The referral wallet will now be applied automatically during raids.
+1. Click **"Save"** – That’s it! The referral wallet will now be applied automatically during visits.
 1. Need to turn it off? **Toggle the switch off anytime.**
 
 ---
