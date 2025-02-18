@@ -124,6 +124,20 @@ input:checked + .slider:before {
     background-color: #c82333;
 }
 
+.footer {
+    color: #777;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.footer a {
+    color: #777;
+    text-decoration: none;
+}
+
 @media (prefers-color-scheme: dark) {
     body {
         background-color: #333;
@@ -158,19 +172,15 @@ input:checked + .slider:before {
     .buttons button.clear:hover {
         background-color: #a71d2a;
     }
+    .footer {
+        color: #ccc;
+    }
+    .footer a {
+        color: #ccc;
+    }
 }
 
 .sub {
     font-size: 0.8em;
     text-align: center;
-}
-
-.footer {
-    margin-top: 20px;
-    color: #777;
-}
-
-.footer a {
-    color: #777;
-    text-decoration: none;
 }

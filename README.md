@@ -1,5 +1,9 @@
 # RObjkt - Referral Objkt (A Referral Enhancer for Objkt.com)
 
+![a FAFO Lab joint](fafo-logo-200.png)
+
+-- a **FAFO Lab** joint --
+
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 RObjkt (**Referral Objkt**) is a browser extension designed for the **Tezos** community to **automatically set the wallet of their choice as the referrer** during NFT purchases on [objkt.com](https://objkt.com).
@@ -43,12 +47,15 @@ RObjkt (**Referral Objkt**) is a browser extension designed for the **Tezos** co
 
 ## 🔧 How to Use
 
-1. **Click the RObjkt extension icon** in your browser toolbar.
-2. **Enable/Disable** the extension using the toggle switch.
-3. **Default mode:** The TIAR raid wallet is automatically applied as the referrer.
-4. **Override mode:** Enter a custom Tezos wallet to use as the referral address.
-5. Click **"Save"** – That’s it! The referral wallet will now be applied automatically during raids.
-6. Need to turn it off? **Toggle the switch off anytime.**
+In standard Markdown, you can’t directly set image width. One workaround is to use HTML tags:
+
+1. **Click the RObjkt extension icon** <img src="icon-off.png" alt="RObjkt extension icon off" width="24" /> in your browser toolbar.
+1. **Enable/Disable** the extension using the toggle switch. You can verify the icon changed to <img src="icon-on.png" alt="RObjkt extension icon on" width="24">
+1. **Default mode:** Until you set a wallet of your preference, the FAFO wallet is used as default.
+1. **Override mode:** Enter a custom Tezos wallet to use as the referral address.
+1. **Passive mode:** Allow previously set referrals to stay. Will not overwrite if a referral wallet is present.
+1. Click **"Save"** – That’s it! The referral wallet will now be applied automatically during raids.
+1. Need to turn it off? **Toggle the switch off anytime.**
 
 ---
 
@@ -68,7 +75,7 @@ Want to improve RObjkt? Contributions are welcome! 🎉
 
 1. Clone this repo:
     ```bash
-    git clone https://github.com/your-repo-name.git
+    git clone https://github.com/skullzarmy/RObjkt.git
     ```
 2. Open **Google Chrome** and go to `chrome://extensions/`.
 3. Enable **Developer Mode**.
@@ -78,7 +85,7 @@ Want to improve RObjkt? Contributions are welcome! 🎉
 ### 🔹 **Reporting Issues / Feature Requests**
 
 -   Found a bug? Have a feature idea?  
-    **Open an issue** in the [GitHub Issues](https://github.com/your-repo-name/issues).
+    **Open an issue** in the [GitHub Issues](https://github.com/skullzarmy/RObjkt/issues).
 
 ---
 
@@ -97,11 +104,10 @@ This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for m
 
 ## ❤️ Credits
 
--   Built for the **TIAR (This IS A Raid) community** at [thisisaraid.xyz](https://thisisaraid.xyz).
--   Inspired by the need to **maximize referral rewards** during NFT raids on objkt.com.
+-   This is a FAFO Lab Joint
 -   Created by [**skllzrmy.tez**](https://github.com/skullzarmy).
 
 ---
 
-🔹 **Ensure your referrals go to the right place during raids!**  
-💬 Got questions? [Open an issue](https://github.com/your-repo-name/issues) or reach out on Twitter/Warpcast.
+🔹 **Ensure your referrals go somewhere!**  
+💬 Got questions? [Open an issue](https://github.com/skullzarmy/RObjkt/issues) or reach out on Twitter/Warpcast.
