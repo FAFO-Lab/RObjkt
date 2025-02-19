@@ -3,7 +3,7 @@
  */
 chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
     const isEnabled = data.isEnabled ?? false;
-    const isPassive = data.isPassive ?? false;
+    const isPassive = data.isPassive ?? true;
     const refWallet = data.refWallet ?? "tz1ZzSmVcnVaWNZKJradtrDnjSjzTp6qjTEW"; // Default wallet
 
     console.log("Extension Loaded with Settings:", { isEnabled, isPassive, refWallet });
@@ -16,30 +16,25 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
      *
      * @param {boolean} [forceReload=false] - Whether to force a page reload if the URL is modified.
      */
-    function updateURL(forceReload = false) {
+    function updateURL() {
         let url = new URL(window.location.href);
         let currentRef = url.searchParams.get("ref");
-        let shouldReload = false;
 
         if (isPassive) {
             if (!currentRef) {
                 console.log("No existing ref detected. Setting ref to:", refWallet);
                 url.searchParams.set("ref", refWallet);
                 window.history.replaceState({}, "", url.toString());
-                shouldReload = true;
             }
         } else {
             if (!currentRef || currentRef !== refWallet) {
                 console.log("Overwriting ref with:", refWallet);
                 url.searchParams.set("ref", refWallet);
                 window.history.replaceState({}, "", url.toString());
-                shouldReload = true;
             }
         }
 
-        if (shouldReload) {
-            chrome.runtime.sendMessage({ type: "reloadPage" });
-        }
+        chrome.runtime.sendMessage({ type: "reloadPage" });
     }
 
     updateURL();
