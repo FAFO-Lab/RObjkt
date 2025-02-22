@@ -11,48 +11,58 @@ const DEFAULT_WALLET = "tz1ZzSmVcnVaWNZKJradtrDnjSjzTp6qjTEW";
  * @param {boolean} isPassive - Whether to only add if missing.
  */
 function updateObjktReferral(refWallet, isPassive) {
-    chrome.scripting.executeScript({
-        target: { allFrames: true, world: "MAIN" },
+  // First get the active tab and check if it's on objkt.com
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0] && tabs[0].url && tabs[0].url.includes("objkt.com")) {
+      chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
         func: (wallet, passiveMode) => {
-            try {
-                let settingsKey = "objkt-settings-local-referral";
-                let existingSettings = JSON.parse(localStorage.getItem(settingsKey)) || {};
-                let timestamp = new Date().toISOString();
+          try {
+            let settingsKey = "objkt-settings-local-referral";
+            let existingSettings =
+              JSON.parse(localStorage.getItem(settingsKey)) || {};
+            let timestamp = new Date().toISOString();
 
-                // Check if the referral already exists
-                let existingEntry = Object.values(existingSettings).find(
-                    (entry) => entry.shares && entry.shares[wallet]
-                );
+            // Check if the referral already exists
+            let existingEntry = Object.values(existingSettings).find(
+              (entry) => entry.shares && entry.shares[wallet]
+            );
 
-                if (passiveMode && existingEntry) {
-                    console.log("Passive mode enabled: Referral already exists, not overwriting.");
-                    return; // Don't overwrite existing entry
-                }
-
-                let newEntry = {
-                    date: timestamp,
-                    shares: { [wallet]: 10000 },
-                    utm_source: null,
-                    utm_medium: null,
-                    utm_campaign: null,
-                    utm_term: null,
-                    utm_content: null,
-                };
-
-                // Merge new referral entry, ensuring the most recent one takes priority
-                let newSettings = {
-                    ...existingSettings,
-                    [`custom-${Date.now()}`]: newEntry,
-                };
-
-                localStorage.setItem(settingsKey, JSON.stringify(newSettings));
-                console.log("Updated Objkt referral settings:", newSettings);
-            } catch (error) {
-                console.error("Error updating Objkt referral settings:", error);
+            if (passiveMode && existingEntry) {
+              console.log(
+                "Passive mode enabled: Referral already exists, not overwriting."
+              );
+              return; // Don't overwrite existing entry
             }
+
+            let newEntry = {
+              date: timestamp,
+              shares: { [wallet]: 10000 },
+              utm_source: null,
+              utm_medium: null,
+              utm_campaign: null,
+              utm_term: null,
+              utm_content: null,
+            };
+
+            // Merge new referral entry, ensuring the most recent one takes priority
+            let newSettings = {
+              ...existingSettings,
+              [`custom-${Date.now()}`]: newEntry,
+            };
+
+            localStorage.setItem(settingsKey, JSON.stringify(newSettings));
+            console.log("Updated Objkt referral settings:", newSettings);
+          } catch (error) {
+            console.error("Error updating Objkt referral settings:", error);
+          }
         },
         args: [refWallet, isPassive],
-    });
+      });
+    } else {
+      console.log("No active tab on objkt.com found");
+    }
+  });
 }
 
 /**
@@ -61,25 +71,25 @@ function updateObjktReferral(refWallet, isPassive) {
  * @param {boolean} isEnabled - Whether the extension is enabled.
  */
 function updateIcon(isEnabled) {
-    chrome.action.setIcon({ path: isEnabled ? "icon-on.png" : "icon-off.png" });
+  chrome.action.setIcon({ path: isEnabled ? "icon-on.png" : "icon-off.png" });
 }
 
 /**
  * Ensures default settings are stored when the extension is installed.
  */
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
-        let defaults = {
-            isEnabled: data.isEnabled ?? false,
-            isPassive: data.isPassive ?? true,
-            refWallet: data.refWallet ?? DEFAULT_WALLET,
-        };
+  chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
+    let defaults = {
+      isEnabled: data.isEnabled ?? false,
+      isPassive: data.isPassive ?? true,
+      refWallet: data.refWallet ?? DEFAULT_WALLET,
+    };
 
-        chrome.storage.local.set(defaults, () => {
-            updateObjktReferral(defaults.refWallet, defaults.isPassive);
-            updateIcon(defaults.isEnabled);
-        });
+    chrome.storage.local.set(defaults, () => {
+      updateObjktReferral(defaults.refWallet, defaults.isPassive);
+      updateIcon(defaults.isEnabled);
     });
+  });
 });
 
 /**
@@ -87,14 +97,14 @@ chrome.runtime.onInstalled.addListener(() => {
  * Retrieves stored settings and applies the referral rule and icon state.
  */
 chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
-    let settings = {
-        isEnabled: data.isEnabled ?? false,
-        isPassive: data.isPassive ?? true,
-        refWallet: data.refWallet ?? DEFAULT_WALLET,
-    };
+  let settings = {
+    isEnabled: data.isEnabled ?? false,
+    isPassive: data.isPassive ?? true,
+    refWallet: data.refWallet ?? DEFAULT_WALLET,
+  };
 
-    updateObjktReferral(settings.refWallet, settings.isPassive);
-    updateIcon(settings.isEnabled);
+  updateObjktReferral(settings.refWallet, settings.isPassive);
+  updateIcon(settings.isEnabled);
 });
 
 /**
@@ -102,13 +112,13 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
  * Updates storage, referral settings, and the extension icon.
  */
 chrome.action.onClicked.addListener(() => {
-    chrome.storage.local.get(["isEnabled", "refWallet", "isPassive"], (data) => {
-        const newState = !data.isEnabled;
-        chrome.storage.local.set({ isEnabled: newState }, () => {
-            updateObjktReferral(data.refWallet, data.isPassive);
-            updateIcon(newState);
-        });
+  chrome.storage.local.get(["isEnabled", "refWallet", "isPassive"], (data) => {
+    const newState = !data.isEnabled;
+    chrome.storage.local.set({ isEnabled: newState }, () => {
+      updateObjktReferral(data.refWallet, data.isPassive);
+      updateIcon(newState);
     });
+  });
 });
 
 /**
@@ -118,23 +128,23 @@ chrome.action.onClicked.addListener(() => {
  * @param {Object} message - The message object received from the sender.
  */
 chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === "updateState") {
-        chrome.storage.local.set({ isEnabled: message.isEnabled }, () => {
-            updateIcon(message.isEnabled);
-        });
-    } else if (message.type === "updateReferral") {
-        chrome.storage.local.set({ refWallet: message.refWallet }, () => {
-            chrome.storage.local.get(["isPassive"], (data) => {
-                updateObjktReferral(message.refWallet, data.isPassive);
-            });
-        });
-    } else if (message.type === "updatePassive") {
-        chrome.storage.local.set({ isPassive: message.isPassive }, () => {
-            chrome.storage.local.get(["refWallet"], (data) => {
-                updateObjktReferral(data.refWallet, message.isPassive);
-            });
-        });
-    }
+  if (message.type === "updateState") {
+    chrome.storage.local.set({ isEnabled: message.isEnabled }, () => {
+      updateIcon(message.isEnabled);
+    });
+  } else if (message.type === "updateReferral") {
+    chrome.storage.local.set({ refWallet: message.refWallet }, () => {
+      chrome.storage.local.get(["isPassive"], (data) => {
+        updateObjktReferral(message.refWallet, data.isPassive);
+      });
+    });
+  } else if (message.type === "updatePassive") {
+    chrome.storage.local.set({ isPassive: message.isPassive }, () => {
+      chrome.storage.local.get(["refWallet"], (data) => {
+        updateObjktReferral(data.refWallet, message.isPassive);
+      });
+    });
+  }
 });
 
 /**
@@ -143,9 +153,9 @@ chrome.runtime.onMessage.addListener((message) => {
  * @param {Object} changes - The changes detected in the local storage.
  */
 chrome.storage.onChanged.addListener((changes) => {
-    if (changes.refWallet || changes.isPassive) {
-        chrome.storage.local.get(["refWallet", "isPassive"], (data) => {
-            updateObjktReferral(data.refWallet, data.isPassive);
-        });
-    }
+  if (changes.refWallet || changes.isPassive) {
+    chrome.storage.local.get(["refWallet", "isPassive"], (data) => {
+      updateObjktReferral(data.refWallet, data.isPassive);
+    });
+  }
 });
