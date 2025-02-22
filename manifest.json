@@ -1,26 +1,32 @@
 {
-    "name": "RObjkt",
-    "version": "1.1.0",
-    "manifest_version": 3,
-    "description": "Referral Objkt: Ensures your referral wallet is always set on objkt.com.",
-    "permissions": ["storage", "webRequest", "declarativeNetRequest", "activeTab"],
-    "host_permissions": ["https://objkt.com/*"],
-    "background": {
-        "service_worker": "background.js"
-    },
-    "content_scripts": [
-        {
-            "matches": ["https://objkt.com/*"],
-            "js": ["content.js"],
-            "run_at": "document_start"
-        }
-    ],
-    "action": {
-        "default_popup": "popup.html",
-        "default_icon": {
-            "16": "icon-off.png",
-            "48": "icon-off.png",
-            "128": "icon-off.png"
-        }
+  "name": "RObjkt",
+  "version": "1.1.0",
+  "manifest_version": 3,
+  "description": "Referral Objkt: Ensures your referral wallet is always set on objkt.com.",
+  "permissions": [
+    "storage",
+    "webRequest",
+    "declarativeNetRequest",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": ["https://objkt.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://objkt.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
     }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon-off.png",
+      "48": "icon-off.png",
+      "128": "icon-off.png"
+    }
+  }
 }
