@@ -5,30 +5,33 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
     const isEnabled = data.isEnabled ?? false;
     const isPassive = data.isPassive ?? true;
     const refWallet = data.refWallet ?? "tz1ZzSmVcnVaWNZKJradtrDnjSjzTp6qjTEW"; // Default wallet
-    const DEBUG_MODE = false; // Set to true for verbose console logging
 
-    if (DEBUG_MODE) console.log("Extension Loaded with Settings:", { isEnabled, isPassive, refWallet });
+    console.log("Extension Loaded with Settings:", { isEnabled, isPassive, refWallet });
 
     if (!isEnabled) return;
 
     /**
-     * Modifies the current URL to include the referral parameter if needed.
+     * Modifies the current URL to include the referral parameter.
+     * Requests a page reload if necessary.
+     *
+     * @param {boolean} [forceReload=false] - Whether to force a page reload if the URL is modified.
      */
     function updateURL() {
         let url = new URL(window.location.href);
         let currentRef = url.searchParams.get("ref");
 
-        if (isPassive && !currentRef) {
-            url.searchParams.set("ref", refWallet);
-            window.history.replaceState({}, "", url.toString());
-            if (DEBUG_MODE) console.log("Passive Mode: Added missing referral ->", refWallet);
-        } else if (!isPassive && currentRef !== refWallet) {
-            url.searchParams.set("ref", refWallet);
-            window.history.replaceState({}, "", url.toString());
-            if (DEBUG_MODE) console.log("Active Mode: Overwritten referral ->", refWallet);
+        if (isPassive) {
+            if (!currentRef) {
+                console.log("No existing ref detected. Setting ref to:", refWallet);
+                url.searchParams.set("ref", refWallet);
+                window.history.replaceState({}, "", url.toString());
+            }
         } else {
-            if (DEBUG_MODE) console.log("No referral update needed.");
-            return;
+            if (!currentRef || currentRef !== refWallet) {
+                console.log("Overwriting ref with:", refWallet);
+                url.searchParams.set("ref", refWallet);
+                window.history.replaceState({}, "", url.toString());
+            }
         }
 
         chrome.runtime.sendMessage({ type: "reloadPage" });
@@ -43,18 +46,22 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
     const observer = new MutationObserver(() => {
         let url = new URL(window.location.href);
         let currentRef = url.searchParams.get("ref");
-
         let shouldReload = false;
-        if (isPassive && !currentRef) {
-            url.searchParams.set("ref", refWallet);
-            window.history.replaceState({}, "", url.toString());
-            shouldReload = true;
-            if (DEBUG_MODE) console.log("SPA Navigation: Added missing referral ->", refWallet);
-        } else if (!isPassive && currentRef !== refWallet) {
-            url.searchParams.set("ref", refWallet);
-            window.history.replaceState({}, "", url.toString());
-            shouldReload = true;
-            if (DEBUG_MODE) console.log("SPA Navigation: Overwritten referral ->", refWallet);
+
+        if (isPassive) {
+            if (!currentRef) {
+                console.log("SPA Navigation Detected: No existing ref, setting ref to:", refWallet);
+                url.searchParams.set("ref", refWallet);
+                window.history.replaceState({}, "", url.toString());
+                shouldReload = true;
+            }
+        } else {
+            if (!currentRef || currentRef !== refWallet) {
+                console.log("SPA Navigation Detected: Overwriting ref with:", refWallet);
+                url.searchParams.set("ref", refWallet);
+                window.history.replaceState({}, "", url.toString());
+                shouldReload = true;
+            }
         }
 
         if (shouldReload) {
@@ -79,7 +86,7 @@ console.log(`
                                                                 
 
     ┏┓┏┓┏┓┏┓  ┓   ┓   •  •   
-┏┓  ┣ ┣┫┣ ┃┃ _┃ ┏┓┣┓_ ┓┏┓┓┏┓╋
+┏┓  ┣ ┣┫┣ ┃┃ –┃ ┏┓┣┓– ┓┏┓┓┏┓╋
 ┗┻  ┻ ┛┗┻ ┗┛  ┗┛┗┻┗┛  ┃┗┛┗┛┗┗
                       ┛      
 `);

@@ -70,12 +70,12 @@ document.getElementById("activeToggle").addEventListener("change", (event) => {
  *
  * @param {Event} event - The change event triggered by the checkbox.
  */
-document.getElementById("passiveToggle").addEventListener("change", (event) => {
-    let isPassive = event.target.checked;
-    chrome.storage.local.set({ isPassive }, () => {
-        chrome.runtime.sendMessage({ type: "updatePassive", isPassive });
-    });
-});
+// document.getElementById("passiveToggle").addEventListener("change", (event) => {
+//     let isPassive = event.target.checked;
+//     chrome.storage.local.set({ isPassive }, () => {
+//         chrome.runtime.sendMessage({ type: "updatePassive", isPassive });
+//     });
+// });
 
 /**
  * Loads stored settings on popup open and updates UI elements accordingly.
@@ -83,7 +83,7 @@ document.getElementById("passiveToggle").addEventListener("change", (event) => {
 chrome.storage.local.get(["refWallet", "isEnabled", "isPassive"], (data) => {
     document.getElementById("wallet").value = data.refWallet || DEFAULT_WALLET;
     document.getElementById("activeToggle").checked = data.isEnabled !== false;
-    document.getElementById("passiveToggle").checked = data.isPassive !== false;
+    // document.getElementById("passiveToggle").checked = data.isPassive !== false;
 });
 
 /**
