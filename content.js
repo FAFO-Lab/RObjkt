@@ -41,8 +41,37 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
 
         if (urlModified) {
             window.history.replaceState({}, "", url.toString());
-            // Only reload if we actually modified the URL
-            chrome.runtime.sendMessage({ type: "reloadPage" });
+
+            // Wait for extension context to be available
+            const tryReload = (retries = 3) => {
+                if (
+                    typeof chrome !== "undefined" &&
+                    chrome.runtime &&
+                    typeof chrome.runtime.sendMessage === "function"
+                ) {
+                    try {
+                        chrome.runtime.sendMessage({ type: "reloadPage" });
+                    } catch (error) {
+                        console.warn("Failed to send reload message:", error);
+                        if (retries > 0) {
+                            setTimeout(() => tryReload(retries - 1), 100);
+                        } else {
+                            window.location.reload();
+                        }
+                    }
+                } else {
+                    if (retries > 0) {
+                        console.log(`Waiting for extension context... (${retries} retries left)`);
+                        setTimeout(() => tryReload(retries - 1), 100);
+                    } else {
+                        console.warn("Extension context not available after retries, reloading page directly");
+                        window.location.reload();
+                    }
+                }
+            };
+
+            // Start the retry process
+            tryReload();
         }
     }
 
@@ -73,7 +102,24 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
 
         if (urlModified) {
             window.history.replaceState({}, "", url.toString());
-            chrome.runtime.sendMessage({ type: "reloadPage" });
+
+            // Debug logging
+            console.log("Chrome object available:", typeof chrome !== "undefined");
+            console.log("Runtime object available:", chrome && typeof chrome.runtime !== "undefined");
+            console.log("SendMessage available:", chrome?.runtime?.sendMessage !== undefined);
+
+            // Check if we're in a valid extension context
+            if (typeof chrome !== "undefined" && chrome.runtime && typeof chrome.runtime.sendMessage === "function") {
+                try {
+                    chrome.runtime.sendMessage({ type: "reloadPage" });
+                } catch (error) {
+                    console.warn("Failed to send reload message:", error);
+                    window.location.reload();
+                }
+            } else {
+                console.warn("Not in a valid extension context, reloading page directly");
+                window.location.reload();
+            }
         }
     });
 
