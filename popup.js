@@ -107,5 +107,5 @@ function showMessage(text, color) {
 /**
  * Displays the current version of the extension.
  */
-const CURRENT_VERSION = "1.1.3";
+const CURRENT_VERSION = "1.1.4";
 document.getElementById("currentVersion").appendChild(document.createTextNode(CURRENT_VERSION));
