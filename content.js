@@ -6,7 +6,11 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
     const isPassive = data.isPassive ?? true;
     const refWallet = data.refWallet ?? "tz1ZzSmVcnVaWNZKJradtrDnjSjzTp6qjTEW"; // Default wallet
 
-    console.log("Extension Loaded with Settings:", { isEnabled, isPassive, refWallet });
+    console.log("Extension Loaded with Settings:", {
+        isEnabled,
+        isPassive,
+        refWallet,
+    });
 
     if (!isEnabled) return;
 
@@ -19,22 +23,27 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
     function updateURL() {
         let url = new URL(window.location.href);
         let currentRef = url.searchParams.get("ref");
+        let urlModified = false;
 
         if (isPassive) {
             if (!currentRef) {
                 console.log("No existing ref detected. Setting ref to:", refWallet);
                 url.searchParams.set("ref", refWallet);
-                window.history.replaceState({}, "", url.toString());
+                urlModified = true;
             }
         } else {
             if (!currentRef || currentRef !== refWallet) {
                 console.log("Overwriting ref with:", refWallet);
                 url.searchParams.set("ref", refWallet);
-                window.history.replaceState({}, "", url.toString());
+                urlModified = true;
             }
         }
 
-        chrome.runtime.sendMessage({ type: "reloadPage" });
+        if (urlModified) {
+            window.history.replaceState({}, "", url.toString());
+            // Only reload if we actually modified the URL
+            chrome.runtime.sendMessage({ type: "reloadPage" });
+        }
     }
 
     updateURL();
@@ -46,25 +55,24 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
     const observer = new MutationObserver(() => {
         let url = new URL(window.location.href);
         let currentRef = url.searchParams.get("ref");
-        let shouldReload = false;
+        let urlModified = false;
 
         if (isPassive) {
             if (!currentRef) {
                 console.log("SPA Navigation Detected: No existing ref, setting ref to:", refWallet);
                 url.searchParams.set("ref", refWallet);
-                window.history.replaceState({}, "", url.toString());
-                shouldReload = true;
+                urlModified = true;
             }
         } else {
             if (!currentRef || currentRef !== refWallet) {
                 console.log("SPA Navigation Detected: Overwriting ref with:", refWallet);
                 url.searchParams.set("ref", refWallet);
-                window.history.replaceState({}, "", url.toString());
-                shouldReload = true;
+                urlModified = true;
             }
         }
 
-        if (shouldReload) {
+        if (urlModified) {
+            window.history.replaceState({}, "", url.toString());
             chrome.runtime.sendMessage({ type: "reloadPage" });
         }
     });
