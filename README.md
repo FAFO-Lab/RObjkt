@@ -8,7 +8,7 @@
 
 RObjkt (**Referral Objkt**) is a browser extension designed for the **Tezos** community to **automatically set the wallet of their choice as the referrer** during NFT purchases on [objkt.com](https://objkt.com).
 
-![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/ofkmpimaoekmjmigkmkpjkbhlfphoboj)
+[![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/ofkmpimaoekmjmigkmkpjkbhlfphoboj)](https://chromewebstore.google.com/detail/ofkmpimaoekmjmigkmkpjkbhlfphoboj?utm_source=item-share-cp)
 
 > **Firefox support also coming soon.** 🔥
 
