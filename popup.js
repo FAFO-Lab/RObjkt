@@ -59,9 +59,12 @@ document.getElementById("clear").addEventListener("click", () => {
 document.getElementById("activeToggle").addEventListener("change", (event) => {
     let isEnabled = event.target.checked;
     chrome.storage.local.set({ isEnabled }, () => {
-        chrome.action.setIcon({ path: isEnabled ? "icon-on.png" : "icon-off.png" });
         chrome.runtime.sendMessage({ type: "updateState", isEnabled });
+        chrome.action.setIcon({ path: isEnabled ? "icon-on.png" : "icon-off.png" });
     });
+    // main-icon element should use the same icon as the extension icon
+    let mainIcon = document.getElementById("main-icon");
+    mainIcon.src = isEnabled ? "icon-on.png" : "icon-off.png";
 });
 
 /**
@@ -107,5 +110,5 @@ function showMessage(text, color) {
 /**
  * Displays the current version of the extension.
  */
-const CURRENT_VERSION = "1.1.4";
+const CURRENT_VERSION = "1.1.5";
 document.getElementById("currentVersion").appendChild(document.createTextNode(CURRENT_VERSION));

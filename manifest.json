@@ -1,9 +1,9 @@
 {
     "name": "RObjkt",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "manifest_version": 3,
     "description": "Referral Objkt: Ensures your referral wallet is always set on objkt.com.",
-    "permissions": ["storage", "webRequest", "declarativeNetRequest", "activeTab", "scripting"],
+    "permissions": ["storage", "declarativeNetRequest", "scripting"],
     "host_permissions": ["https://objkt.com/*"],
     "background": {
         "service_worker": "background.js"
@@ -17,6 +17,7 @@
     ],
     "action": {
         "default_popup": "popup.html",
+        "default_title": "RObjkt",
         "default_icon": {
             "16": "icon-off.png",
             "48": "icon-off.png",

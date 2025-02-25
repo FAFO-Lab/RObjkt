@@ -132,6 +132,8 @@ input:checked + .slider:before {
     flex-direction: column;
     align-items: center;
     gap: 15px;
+    font-family: monospace;
+    font-size: 10px;
 }
 
 .footer a {

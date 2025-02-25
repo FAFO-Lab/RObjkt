@@ -12,9 +12,7 @@ const DEFAULT_WALLET = "tz1ZzSmVcnVaWNZKJradtrDnjSjzTp6qjTEW";
 function updateReferralRule(refWallet, isEnabled, isPassive) {
     // Remove the old rule (if any)
     chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [1] }, () => {
-        if (isEnabled) {
-            // We use a simple urlFilter to match objkt.com URLs.
-            // Passive mode (conditional update) is not supported, so we always add/replace.
+        if (isEnabled && !isPassive) {
             const condition = { urlFilter: "objkt.com" };
 
             const rule = {
