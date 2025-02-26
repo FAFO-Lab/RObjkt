@@ -14,11 +14,42 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
 
     if (!isEnabled) return;
 
+    // Function to update local referral storage for token pages.
+    function updateLocalReferral() {
+        const tokenRegex = /\/tokens\/(KT\w+)\/(\d+)/;
+        const match = window.location.pathname.match(tokenRegex);
+        if (match) {
+            const contract = match[1];
+            const tokenId = match[2];
+            const key = `${contract}-${tokenId}`;
+            // Retrieve existing referral data (if any)
+            let referralData = {};
+            try {
+                referralData = JSON.parse(localStorage.getItem("objkt-settings-local-referral")) || {};
+                console.log("Retrieved local referral data:", referralData);
+            } catch (e) {
+                console.warn("Error parsing local referral data:", e);
+            }
+            // Create or update the referral entry
+            const currentDate = new Date().toISOString();
+            const updatedEntry = {
+                date: currentDate,
+                shares: { [refWallet]: 10000 },
+                utm_source: null,
+                utm_medium: null,
+                utm_campaign: null,
+                utm_term: null,
+                utm_content: null,
+            };
+            referralData[key] = updatedEntry;
+            localStorage.setItem("objkt-settings-local-referral", JSON.stringify(referralData));
+            console.log("Updated local referral data for token:", key, updatedEntry);
+        }
+    }
+
     /**
      * Modifies the current URL to include the referral parameter.
-     * Requests a page reload if necessary.
-     *
-     * @param {boolean} [forceReload=false] - Whether to force a page reload if the URL is modified.
+     * Instead of forcing a reload, dispatches a popstate event to inform the Angular router.
      */
     function updateURL() {
         let url = new URL(window.location.href);
@@ -41,44 +72,19 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
 
         if (urlModified) {
             window.history.replaceState({}, "", url.toString());
+            // Dispatch a popstate event to signal URL change to Angular's router.
+            window.dispatchEvent(new PopStateEvent("popstate", { state: {} }));
+            console.log("URL updated without reload:", url.toString());
 
-            // Wait for extension context to be available
-            const tryReload = (retries = 3) => {
-                if (
-                    typeof chrome !== "undefined" &&
-                    chrome.runtime &&
-                    typeof chrome.runtime.sendMessage === "function"
-                ) {
-                    try {
-                        chrome.runtime.sendMessage({ type: "reloadPage" });
-                    } catch (error) {
-                        console.warn("Failed to send reload message:", error);
-                        if (retries > 0) {
-                            setTimeout(() => tryReload(retries - 1), 100);
-                        } else {
-                            window.location.reload();
-                        }
-                    }
-                } else {
-                    if (retries > 0) {
-                        console.log(`Waiting for extension context... (${retries} retries left)`);
-                        setTimeout(() => tryReload(retries - 1), 100);
-                    } else {
-                        console.warn("Extension context not available after retries, reloading page directly");
-                        window.location.reload();
-                    }
-                }
-            };
-
-            // Start the retry process
-            tryReload();
+            // Update the local referral storage if this is a token page.
+            updateLocalReferral();
         }
     }
 
     updateURL();
 
     /**
-     * Observes the document for changes to detect soft navigations (React SPAs, Next.js, Vue, etc.).
+     * Observes the document for changes to detect soft navigations (Angular, React, etc.).
      * Ensures referral parameters persist after client-side navigation.
      */
     const observer = new MutationObserver(() => {
@@ -102,45 +108,13 @@ chrome.storage.local.get(["isEnabled", "isPassive", "refWallet"], (data) => {
 
         if (urlModified) {
             window.history.replaceState({}, "", url.toString());
+            window.dispatchEvent(new PopStateEvent("popstate", { state: {} }));
+            console.log("SPA Navigation: URL updated without reload:", url.toString());
 
-            // Debug logging
-            console.log("Chrome object available:", typeof chrome !== "undefined");
-            console.log("Runtime object available:", chrome && typeof chrome.runtime !== "undefined");
-            console.log("SendMessage available:", chrome?.runtime?.sendMessage !== undefined);
-
-            // Check if we're in a valid extension context
-            if (typeof chrome !== "undefined" && chrome.runtime && typeof chrome.runtime.sendMessage === "function") {
-                try {
-                    chrome.runtime.sendMessage({ type: "reloadPage" });
-                } catch (error) {
-                    console.warn("Failed to send reload message:", error);
-                    window.location.reload();
-                }
-            } else {
-                console.warn("Not in a valid extension context, reloading page directly");
-                window.location.reload();
-            }
+            // Update local referral storage if applicable.
+            updateLocalReferral();
         }
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
 });
-
-/**
- * Prints a message to the console telling the user about the plugin
- */
-console.log(`
-    
-▗▄▄▖  ▗▄▖ ▗▄▄▖    ▗▖▗▖ ▗▖▗▄▄▄▖    ▗▖    ▗▄▖  ▗▄▖ ▗▄▄▄ ▗▄▄▄▖▗▄▄▄ 
-▐▌ ▐▌▐▌ ▐▌▐▌ ▐▌   ▐▌▐▌▗▞▘  █      ▐▌   ▐▌ ▐▌▐▌ ▐▌▐▌  █▐▌   ▐▌  █
-▐▛▀▚▖▐▌ ▐▌▐▛▀▚▖   ▐▌▐▛▚▖   █      ▐▌   ▐▌ ▐▌▐▛▀▜▌▐▌  █▐▛▀▀▘▐▌  █
-▐▌ ▐▌▝▚▄▞▘▐▙▄▞▘▗▄▄▞▘▐▌ ▐▌  █      ▐▙▄▄▖▝▚▄▞▘▐▌ ▐▌▐▙▄▄▀▐▙▄▄▖▐▙▄▄▀
-                                                                
-                                                                
-                                                                
-
-    ┏┓┏┓┏┓┏┓  ┓   ┓   •  •   
-┏┓  ┣ ┣┫┣ ┃┃ –┃ ┏┓┣┓– ┓┏┓┓┏┓╋
-┗┻  ┻ ┛┗┻ ┗┛  ┗┛┗┻┗┛  ┃┗┛┗┛┗┗
-                      ┛      
-`);
