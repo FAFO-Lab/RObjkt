@@ -28,11 +28,11 @@ document.getElementById("save").addEventListener("click", () => {
     }
 
     if (refWallet && refWallet !== DEFAULT_WALLET && isValidTezosAddress(refWallet)) {
-        chrome.storage.local.set({ refWallet }, () => {
+        browser.storage.local.set({ refWallet }).then(() => {
             showMessage("Referral wallet saved!", "green");
         });
     } else if (refWallet === DEFAULT_WALLET) {
-        chrome.storage.local.set({ refWallet }, () => {
+        browser.storage.local.set({ refWallet }).then(() => {
             showMessage("Default referral wallet restored!", "green");
         });
     } else {
@@ -45,22 +45,22 @@ document.getElementById("save").addEventListener("click", () => {
  */
 document.getElementById("clear").addEventListener("click", () => {
     document.getElementById("wallet").value = "";
-    chrome.storage.local.set({ refWallet: DEFAULT_WALLET }, () => {
+    browser.storage.local.set({ refWallet: DEFAULT_WALLET }).then(() => {
         showMessage("Referral wallet cleared!", "red");
     });
 });
 
 /**
  * Toggles the extension's active state when the user interacts with the switch.
- * Updates Chrome storage and notifies the background script.
+ * Updates browser storage and notifies the background script.
  *
  * @param {Event} event - The change event triggered by the checkbox.
  */
 document.getElementById("activeToggle").addEventListener("change", (event) => {
     let isEnabled = event.target.checked;
-    chrome.storage.local.set({ isEnabled }, () => {
-        chrome.runtime.sendMessage({ type: "updateState", isEnabled });
-        chrome.action.setIcon({ path: isEnabled ? "icon-on.png" : "icon-off.png" });
+    browser.storage.local.set({ isEnabled }).then(() => {
+        browser.runtime.sendMessage({ type: "updateState", isEnabled });
+        browser.action.setIcon({ path: isEnabled ? "icon-on.png" : "icon-off.png" });
     });
     // main-icon element should use the same icon as the extension icon
     let mainIcon = document.getElementById("main-icon");
@@ -69,25 +69,28 @@ document.getElementById("activeToggle").addEventListener("change", (event) => {
 
 /**
  * Toggles passive mode, determining whether the extension should override existing referrals.
- * Updates Chrome storage and notifies the background script.
+ * Updates browser storage and notifies the background script.
  *
  * @param {Event} event - The change event triggered by the checkbox.
  */
 document.getElementById("passiveToggle").addEventListener("change", (event) => {
     let isPassive = event.target.checked;
-    chrome.storage.local.set({ isPassive }, () => {
-        chrome.runtime.sendMessage({ type: "updatePassive", isPassive });
+    browser.storage.local.set({ isPassive }).then(() => {
+        browser.runtime.sendMessage({ type: "updatePassive", isPassive });
     });
 });
 
 /**
  * Loads stored settings on popup open and updates UI elements accordingly.
  */
-chrome.storage.local.get(["refWallet", "isEnabled", "isPassive"], (data) => {
-    document.getElementById("wallet").value = data.refWallet || DEFAULT_WALLET;
-    document.getElementById("activeToggle").checked = data.isEnabled !== false;
-    document.getElementById("passiveToggle").checked = data.isPassive !== false;
-});
+browser.storage.local
+    .get(["refWallet", "isEnabled", "isPassive"])
+    .then((data) => {
+        document.getElementById("wallet").value = data.refWallet || DEFAULT_WALLET;
+        document.getElementById("activeToggle").checked = data.isEnabled === true;
+        document.getElementById("passiveToggle").checked = data.isPassive !== false;
+    })
+    .catch((error) => console.error("Error loading settings:", error));
 
 /**
  * Displays a temporary message to the user.
