@@ -1,5 +1,8 @@
-// Import browser compatibility layer
-importScripts("browser-polyfill.js");
+// Import browser compatibility layer in Service Worker context (e.g. Chrome MV3)
+// In Event Page context (e.g. Firefox MV3), scripts are loaded sequentially via manifest.json
+if (typeof importScripts !== 'undefined') {
+    importScripts("browser-polyfill.js");
+}
 
 const DEFAULT_WALLET = "tz1ZzSmVcnVaWNZKJradtrDnjSjzTp6qjTEW";
 

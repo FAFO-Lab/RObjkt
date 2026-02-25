@@ -6,7 +6,8 @@
     "permissions": ["storage", "declarativeNetRequest", "scripting"],
     "host_permissions": ["https://objkt.com/*"],
     "background": {
-        "service_worker": "background.js"
+        "service_worker": "background.js",
+        "scripts": ["browser-polyfill.js", "background.js"]
     },
     "browser_specific_settings": {
         "gecko": {
