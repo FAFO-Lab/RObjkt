@@ -111,7 +111,7 @@ function showMessage(text, color) {
 }
 
 /**
- * Displays the current version of the extension.
+ * Displays the current version of the extension from the manifest.
  */
-const CURRENT_VERSION = "1.2.1";
-document.getElementById("currentVersion").appendChild(document.createTextNode(CURRENT_VERSION));
+const manifestData = browser.runtime.getManifest();
+document.getElementById("currentVersion").textContent = "v" + manifestData.version;

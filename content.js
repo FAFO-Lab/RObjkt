@@ -1,4 +1,22 @@
 /**
+ * Generates a local timezone ISO string matching objkt.com's format.
+ * e.g. "2026-02-24T23:02:31.282-08:00"
+ * @returns {string} - Local ISO timestamp with timezone offset
+ */
+function getLocalISOString() {
+    const now = new Date();
+    const offset = -now.getTimezoneOffset();
+    const sign = offset >= 0 ? "+" : "-";
+    const pad = (n) => String(Math.floor(Math.abs(n))).padStart(2, "0");
+    return (
+        `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}` +
+        `T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}` +
+        `.${String(now.getMilliseconds()).padStart(3, "0")}` +
+        `${sign}${pad(offset / 60)}:${pad(offset % 60)}`
+    );
+}
+
+/**
  * Retrieves stored settings and applies referral modifications based on user preferences.
  */
 browser.storage.local
@@ -8,7 +26,7 @@ browser.storage.local
         const isPassive = data.isPassive ?? true;
         const refWallet = data.refWallet ?? "tz1ZzSmVcnVaWNZKJradtrDnjSjzTp6qjTEW"; // Default wallet
 
-        console.log("Extension Loaded with Settings:", {
+        console.log("RObjkt: Extension Loaded with Settings:", {
             isEnabled,
             isPassive,
             refWallet,
@@ -21,7 +39,13 @@ browser.storage.local
 
         // Debounce timer to avoid rapid-fire URL changes
         let debounceTimer = null;
-        const DEBOUNCE_DELAY = 250; // milliseconds
+        const DEBOUNCE_DELAY = 300; // milliseconds
+
+        // Guard flag to prevent our own replaceState calls from re-triggering
+        let isOwnReplaceState = false;
+
+        // Regex matches both /tokens/ and legacy /asset/ paths
+        const tokenRegex = /\/(?:tokens|asset)\/(KT\w+)\/(\d+)/;
 
         /**
          * Normalizes a URL path by removing known tab suffixes and ref parameters
@@ -53,9 +77,11 @@ browser.storage.local
             return `${normalizedPath}${queryParams ? "?" + queryParams : ""}`;
         }
 
-        // Function to update local referral storage for token pages.
-        function updateLocalReferral() {
-            const tokenRegex = /\/tokens\/(KT\w+)\/(\d+)/;
+        /**
+         * Updates local referral storage for token pages.
+         * @param {string} walletAddress - The wallet address to set as the referral
+         */
+        function updateLocalReferral(walletAddress) {
             const match = window.location.pathname.match(tokenRegex);
             if (match) {
                 const contract = match[1];
@@ -65,15 +91,13 @@ browser.storage.local
                 let referralData = {};
                 try {
                     referralData = JSON.parse(localStorage.getItem("objkt-settings-local-referral")) || {};
-                    console.log("Retrieved local referral data:", referralData);
                 } catch (e) {
-                    console.warn("Error parsing local referral data:", e);
+                    console.warn("RObjkt: Error parsing local referral data:", e);
                 }
-                // Create or update the referral entry
-                const currentDate = new Date().toISOString();
+                // Create or update the referral entry using local timezone format
                 const updatedEntry = {
-                    date: currentDate,
-                    shares: { [refWallet]: 10000 },
+                    date: getLocalISOString(),
+                    shares: { [walletAddress]: 10000 },
                     utm_source: null,
                     utm_medium: null,
                     utm_campaign: null,
@@ -82,20 +106,19 @@ browser.storage.local
                 };
                 referralData[key] = updatedEntry;
                 localStorage.setItem("objkt-settings-local-referral", JSON.stringify(referralData));
-                console.log("Updated local referral data for token:", key, updatedEntry);
+                console.log("RObjkt: Updated local referral for token:", key, "wallet:", walletAddress);
             }
         }
 
         /**
-         * Modifies the current URL to include the referral parameter.
-         * Avoids processing the same path multiple times.
+         * Modifies the current URL to include the referral parameter and ensures
+         * the localStorage referral entry is always written for token pages.
          */
         function updateURL() {
             const pageKey = getPageKey();
 
             // If we've already processed this path, don't do it again
             if (processedPaths.has(pageKey)) {
-                console.log("Path already processed, skipping:", pageKey);
                 return;
             }
 
@@ -105,35 +128,42 @@ browser.storage.local
 
             if (isPassive) {
                 if (!currentRef) {
-                    console.log("No existing ref detected. Setting ref to:", refWallet);
+                    // No existing ref — set ours
+                    console.log("RObjkt: No existing ref detected. Setting ref to:", refWallet);
                     url.searchParams.set("ref", refWallet);
                     urlModified = true;
+                    // Write localStorage with our wallet
+                    updateLocalReferral(refWallet);
+                } else {
+                    // Existing ref present — respect it (passive mode)
+                    console.log("RObjkt: Passive mode — preserving existing ref:", currentRef);
+                    // Still write localStorage with the EXISTING ref to ensure it's captured
+                    updateLocalReferral(currentRef);
                 }
             } else {
+                // Active mode — always set our wallet
                 if (!currentRef || currentRef !== refWallet) {
-                    console.log("Overwriting ref with:", refWallet);
+                    console.log("RObjkt: Active mode — setting ref to:", refWallet);
                     url.searchParams.set("ref", refWallet);
                     urlModified = true;
                 }
+                // Always write localStorage with our wallet in active mode
+                updateLocalReferral(refWallet);
             }
 
             if (urlModified) {
+                isOwnReplaceState = true;
                 window.history.replaceState({}, "", url.toString());
-                // Dispatch a popstate event to signal URL change to Angular's router.
-                window.dispatchEvent(new PopStateEvent("popstate", { state: {} }));
-                console.log("URL updated without reload:", url.toString());
-
-                // Update the local referral storage if this is a token page.
-                updateLocalReferral();
+                isOwnReplaceState = false;
+                console.log("RObjkt: URL updated:", url.toString());
             }
 
             // Mark this path as processed regardless of whether we modified it
             processedPaths.add(pageKey);
-            console.log("Added to processed paths:", pageKey);
         }
 
-        // Initial URL update
-        updateURL();
+        // Initial URL update (wait briefly for Angular to finish initial load)
+        setTimeout(updateURL, 100);
 
         /**
          * Debounced handler for URL changes
@@ -146,16 +176,13 @@ browser.storage.local
 
             // Set a new timer
             debounceTimer = setTimeout(() => {
-                const currentPath = window.location.pathname;
-                const currentUrl = window.location.href;
-                console.log("Debounced URL change detected:", currentUrl);
                 updateURL();
             }, DEBOUNCE_DELAY);
         }
 
         /**
          * Listen for history changes (pushState/replaceState/popstate)
-         * This is more reliable than mutation observers for detecting actual navigation
+         * This reliably detects SPA navigation in Angular
          */
         const originalPushState = history.pushState;
         history.pushState = function () {
@@ -166,25 +193,39 @@ browser.storage.local
         const originalReplaceState = history.replaceState;
         history.replaceState = function () {
             originalReplaceState.apply(this, arguments);
-            handleURLChange();
+            // Only handle URL changes not triggered by our own replaceState
+            if (!isOwnReplaceState) {
+                handleURLChange();
+            }
         };
 
         window.addEventListener("popstate", handleURLChange);
 
         /**
-         * MutationObserver as a fallback for SPA frameworks that might
-         * manipulate the DOM without using history API
+         * Lightweight MutationObserver as a fallback for SPA navigation detection.
+         * Only watches for major structural changes, not every DOM mutation.
          */
+        let lastObservedPath = window.location.pathname + window.location.search;
         const observer = new MutationObserver(() => {
-            // Use the debounced handler
-            handleURLChange();
+            const currentPath = window.location.pathname + window.location.search;
+            if (currentPath !== lastObservedPath) {
+                lastObservedPath = currentPath;
+                handleURLChange();
+            }
         });
 
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-            attributes: false,
-            characterData: false,
-        });
+        // Wait for body to be available, then observe
+        function startObserver() {
+            if (document.body) {
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: false, // Only watch direct children, not deep subtree
+                });
+            } else {
+                // Body not ready yet, try again shortly
+                setTimeout(startObserver, 50);
+            }
+        }
+        startObserver();
     })
-    .catch((error) => console.error("Error loading storage settings:", error));
+    .catch((error) => console.error("RObjkt: Error loading storage settings:", error));
