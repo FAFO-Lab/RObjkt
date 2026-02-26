@@ -9,8 +9,7 @@
 RObjkt (**Referral Objkt**) is a browser extension designed for the **Tezos** community to **automatically set the wallet of their choice as the referrer** during NFT purchases on [objkt.com](https://objkt.com).
 
 [![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/ofkmpimaoekmjmigkmkpjkbhlfphoboj)](https://chromewebstore.google.com/detail/ofkmpimaoekmjmigkmkpjkbhlfphoboj?utm_source=item-share-cp)
-
-> **Firefox support also coming soon.** 🔥
+[![Mozilla Add-on Version](https://img.shields.io/amo/v/robjkt)](https://addons.mozilla.org/en-US/firefox/addon/robjkt/)
 
 ---
 
@@ -29,11 +28,17 @@ RObjkt (**Referral Objkt**) is a browser extension designed for the **Tezos** co
 
 ## 📥 Installation
 
-### 🔹 **From Chrome Web Store (Coming Soon)**
+### 🔹 **From Chrome Web Store**
 
 1. **[Click here](https://chromewebstore.google.com/detail/ofkmpimaoekmjmigkmkpjkbhlfphoboj?utm_source=item-share-cp)**
 2. Click **"Add to Chrome"**.
 3. Confirm by clicking **"Add Extension"**.
+
+### 🔹 **From Firefox Add-ons**
+
+1. **[Click here](https://addons.mozilla.org/en-US/firefox/addon/robjkt/)**
+2. Click **"Add to Firefox"**.
+3. Confirm by clicking **"Add"**.
 
 ### 🔹 **Manual Installation (For Developers)**
 
@@ -90,8 +95,7 @@ Want to improve RObjkt? Contributions are welcome! 🎉
 
 ## 🚀 Coming Soon
 
-🔹 **Chrome Web Store Listing**  
-🔹 **Firefox Support** _(Extensions for Mozilla are in the works!)_
+🔹 **More features and updates!**
 
 ---
 
